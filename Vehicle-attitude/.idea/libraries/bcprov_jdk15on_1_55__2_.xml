@@ -1,0 +1,18 @@
+<component name="libraryTable">
+  <library name="bcprov-jdk15on-1.55 (2)">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/.idea/jars/bcprov-jdk15on-1.55.jar!/" />
+      <root url="jar://$PROJECT_DIR$/.idea/jars/jpbc-1.0.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/.idea/jars/log4j-1.2.17.jar!/" />
+      <root url="jar://$PROJECT_DIR$/.idea/jars/log4j-api-2.13.3.jar!/" />
+      <root url="jar://$PROJECT_DIR$/.idea/jars/log4j-to-slf4j-2.13.3.jar!/" />
+      <root url="jar://$PROJECT_DIR$/.idea/jars/logback-classic-1.2.3.jar!/" />
+      <root url="jar://$PROJECT_DIR$/.idea/jars/logback-core-1.2.3.jar!/" />
+      <root url="jar://$PROJECT_DIR$/.idea/jars/lombok-1.18.18.jar!/" />
+      <root url="jar://$PROJECT_DIR$/.idea/jars/plaf.jpbc-1.0.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/.idea/jars/slf4j-api-1.7.30.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

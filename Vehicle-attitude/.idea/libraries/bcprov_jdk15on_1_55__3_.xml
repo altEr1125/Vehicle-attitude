@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="bcprov-jdk15on-1.55 (3)">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/.idea/jars/bcprov-jdk15on-1.55.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
