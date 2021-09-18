@@ -22,9 +22,14 @@ import java.util.Map;
 public class Connect {
     CarHandshakeTool cht;
     String vin;
-    String firstHandshake_url = "http://192.168.98.42:9008/platform/firstHandshake";
-    String secondHandShake_url = "http://192.168.98.42:9008/platform/secondHandShake";
-    String sendMessage_url = "sendMessage_url";
+        String get_param_url = "http://49.233.2.68:9006/keys/getAll/";
+        String firstHandshake_url = "http://49.233.2.68:9008/platform/firstHandshake";
+        String secondHandShake_url = "http://49.233.2.68:9008/platform/secondHandshake";
+        String sendMessage_url = "http://49.233.2.68:9008/postMap";
+/*    String get_param_url = "http://192.168.12.134:9006/keys/getAll/";
+    String firstHandshake_url = "http://192.168.12.134:9008/platform/firstHandshake";
+    String secondHandShake_url = "http://192.168.12.134:9008/platform/secondHandshake";
+    String sendMessage_url = "http://192.168.12.134:9008/postMap";*/
 
     public Connect(CarHandshakeTool cht, String vin) {
         this.cht = cht;
@@ -38,7 +43,7 @@ public class Connect {
         // 获得Http客户端(可以理解为:你得先有一个浏览器;注意:实际上HttpClient与浏览器是不一样的)
         CloseableHttpClient httpClient = HttpClientBuilder.create().build();
         // 创建Get请求
-        String url = "http://49.233.2.68:9006/keys/getAll/" + vin;
+        String url = get_param_url + vin;
         HttpGet httpGet = new HttpGet(url);
 
         // 响应模型
@@ -58,7 +63,7 @@ public class Connect {
                 Map<String, String> cipher_map = JSON.parseObject(data, HashMap.class);
                 cipher_map.put("message", obj.get("message").toString());
                 cipher_map.put("status", obj.get("status").toString());
-                //System.out.println("响应内容为:" + result);
+                System.out.println("get_param响应内容为:" + cipher_map);
                 return cipher_map;
             }
             return null;
@@ -90,8 +95,8 @@ public class Connect {
         CloseableHttpClient httpClient = HttpClients.createDefault();
         // 创建Post请求
         HttpPost httpPost = new HttpPost(url);
-
         Map<String, String> map = cht.send_map_first(vin);
+        System.out.println("cht.send_map_first:" + map);
         //将Object转换为json字符串
         String jsonString = JSON.toJSONString(map);
 
@@ -113,11 +118,13 @@ public class Connect {
             if (responseEntity != null) {
                 //System.out.println("响应内容长度为:" + responseEntity.getContentLength());
                 String result = EntityUtils.toString(response.getEntity());
+
                 Map<String, String> firstReceive_map = JSON.parseObject(result, HashMap.class);
-                //System.out.println("响应内容为:" + result);
+                System.out.println("conn_fh响应内容为:" + firstReceive_map);
                 Map<String, String> df_map = cht.dealFirst(firstReceive_map, firstReceive_map.get("clientRandom"), firstReceive_map.get("vinCode"),
                         cipher_map.get("signPrivateKeyStr"), cipher_map.get("exchangePrivateKeyStr"), cipher_map.get("masterEncryptKeyStr"),
                         cipher_map.get("masterSignKeyStr"));
+                System.out.println("cht.dealFirst:" + df_map);
                 conn_sh(df_map, firstReceive_map.get("vinCode"));
             }
 
@@ -168,11 +175,12 @@ public class Connect {
 
             //System.out.println("响应状态为:" + response.getStatusLine());
             if (responseEntity != null) {
-                //.out.println("响应内容长度为:" + responseEntity.getContentLength());
+                //System.out.println("响应内容长度为:" + responseEntity.getContentLength());
                 String result = EntityUtils.toString(response.getEntity());
+                System.out.println("conn_sh_result:" + result);
                 Map<String, String> secondReceive_map = JSON.parseObject(result, HashMap.class);
-                //System.out.println("响应内容为:" + result);
-                boolean flag = cht.dealSecond(df_map, vinCode);
+                System.out.println("conn_sh响应内容为:" + secondReceive_map);
+                boolean flag = cht.dealSecond(secondReceive_map, vinCode);
                 System.out.println("dealSecond result:" + flag);
             }
 
@@ -201,13 +209,16 @@ public class Connect {
     }
 
     public void sendMessage(String message) {
+
+        Map<String, String> message_map = new HashMap<>();
+        message_map.put("message", message);
         String url = sendMessage_url;
         // 获得Http客户端
         CloseableHttpClient httpClient = HttpClients.createDefault();
         // 创建Post请求
         HttpPost httpPost = new HttpPost(url);
         //将Object转换为json字符串
-        String jsonString = JSON.toJSONString(message);
+        String jsonString = JSON.toJSONString(message_map);
 
         StringEntity entity = new StringEntity(jsonString, "UTF-8");
         // post请求是将参数放在请求体里面传过去的;这里将entity放入post请求体中
@@ -225,10 +236,10 @@ public class Connect {
 
             //System.out.println("响应状态为:" + response.getStatusLine());
             if (responseEntity != null) {
-                //.out.println("响应内容长度为:" + responseEntity.getContentLength());
+                //System.out.println("响应内容长度为:" + responseEntity.getContentLength());
                 String result = EntityUtils.toString(response.getEntity());
-                Map<String, String> secondReceive_map = JSON.parseObject(result, HashMap.class);
-                //System.out.println("响应内容为:" + result);
+                //Map<String, String> secondReceive_map = JSON.parseObject(result, HashMap.class);
+                System.out.println("响应内容为:" + result);
             }
 
         } catch (ClientProtocolException e) {

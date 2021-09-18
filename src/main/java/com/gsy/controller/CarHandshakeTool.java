@@ -1,20 +1,10 @@
 package com.gsy.controller;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.gsy.encrypt.gm.sm3.SM3;
+import com.gsy.encrypt.gm.sm4.SM4;
 import com.gsy.encrypt.gm.sm9.*;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.HttpEntity;
-import org.apache.http.ParseException;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.util.EntityUtils;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
@@ -73,7 +63,6 @@ public class CarHandshakeTool {
                                          String spkStr, String cpkStr,
                                          String empkStr, String smpkStr) {
         //System.out.println("ccccccc deal dealFirst");
-        //System.out.println(map);
         //结果
         Map<String, String> result = new HashMap<>();
         //身份认证
@@ -155,9 +144,11 @@ public class CarHandshakeTool {
                     map.get("serverName"),
                     cck, ctk, stpk, 16);
             result.put("SB", CodeUtil.encodeToString(cak.getSB1()));
-            result.put("ctpk", CodeUtil.encodeToString(ctk.getPublicKey().toByteArray()));
+            result.put("carTempKey", CodeUtil.encodeToString(ctk.getPublicKey().toByteArray()));
             String disable = map.get("serverName") + ":disable";
             this.sk = CodeUtil.encodeToString(cak.getSK());
+            byte[] saBytes = SM3.getInstance().digest(cak.getSK());
+            result.put("digest", CodeUtil.encodeToString(saBytes));
             //log.info(myServiceName + " 生成了与 " + map.get("serverName") + " 待用的会话密钥！");
             Iterator<Map.Entry<String, String>> it = result.entrySet().iterator();
             while (it.hasNext()) {
@@ -169,6 +160,7 @@ public class CarHandshakeTool {
 
             return null;
         }
+        //System.out.println("111111"+result);
         return result;
     }
 
@@ -185,7 +177,7 @@ public class CarHandshakeTool {
      */
     public boolean dealSecond(Map<String, String> map, String myServiceName) throws NoSuchAlgorithmException {
         //System.out.println("ddddddddd deal dealSecond");
-        //System.out.println(map);
+        System.out.println(map);
 
         byte[] saBytes1 = CodeUtil.decodeStringToByte(this.sk);
         byte[] saBytes = SM3.getInstance().digest(saBytes1);
@@ -212,4 +204,10 @@ public class CarHandshakeTool {
         return false;
     }
 
+    public String encrypt_sendMessage(String message) throws Exception {
+        byte[] message_bytes = CodeUtil.decodeStringToByte(message);
+        String result = CodeUtil.encodeToString(
+                SM4.ecbCrypt(true, CodeUtil.decodeStringToByte(this.sk), message_bytes, 0, message.length()));
+        return result;
+    }
 }
