@@ -5,7 +5,6 @@ import it.unisa.dia.gas.plaf.jpbc.field.curve.CurveElement;
 /**
  * SM9 public key on G1 group.
  * <p>
- * Created by yaoyuan on 2019/4/15.
  */
 public class G1PublicKey {
     CurveElement Q;

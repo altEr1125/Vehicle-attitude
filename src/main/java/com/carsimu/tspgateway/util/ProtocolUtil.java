@@ -4,7 +4,7 @@ import com.carsimu.tspcommon.pojo.EngineData;
 import com.carsimu.tspcommon.pojo.Message17691;
 import com.carsimu.tspcommon.pojo.OBDData;
 import com.carsimu.tspcommon.pojo.OtherData;
-import com.sun.istack.internal.NotNull;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Calendar;
 import java.util.Date;

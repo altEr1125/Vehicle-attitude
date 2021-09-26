@@ -37,33 +37,33 @@ public class Connect {
     }
 
     /*
-è½¦è¾†æ¿€æ´»é˜¶æ®µï¼Œè·å–è½¦è¾†éœ€è¦çš„ç›¸å…³å¯†é’¥
+³µÁ¾¼¤»î½×¶Î£¬»ñÈ¡³µÁ¾ĞèÒªµÄÏà¹ØÃÜÔ¿
 */
     public Map<String, String> get_param(String vin) {
-        // è·å¾—Httpå®¢æˆ·ç«¯(å¯ä»¥ç†è§£ä¸º:ä½ å¾—å…ˆæœ‰ä¸€ä¸ªæµè§ˆå™¨;æ³¨æ„:å®é™…ä¸ŠHttpClientä¸æµè§ˆå™¨æ˜¯ä¸ä¸€æ ·çš„)
+        // »ñµÃHttp¿Í»§¶Ë(¿ÉÒÔÀí½âÎª:ÄãµÃÏÈÓĞÒ»¸öä¯ÀÀÆ÷;×¢Òâ:Êµ¼ÊÉÏHttpClientÓëä¯ÀÀÆ÷ÊÇ²»Ò»ÑùµÄ)
         CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-        // åˆ›å»ºGetè¯·æ±‚
+        // ´´½¨GetÇëÇó
         String url = get_param_url + vin;
         HttpGet httpGet = new HttpGet(url);
 
-        // å“åº”æ¨¡å‹
+        // ÏìÓ¦Ä£ĞÍ
         CloseableHttpResponse response = null;
         try {
-            // ç”±å®¢æˆ·ç«¯æ‰§è¡Œ(å‘é€)Getè¯·æ±‚
+            // ÓÉ¿Í»§¶ËÖ´ĞĞ(·¢ËÍ)GetÇëÇó
             response = httpClient.execute(httpGet);
-            // ä»å“åº”æ¨¡å‹ä¸­è·å–å“åº”å®ä½“
+            // ´ÓÏìÓ¦Ä£ĞÍÖĞ»ñÈ¡ÏìÓ¦ÊµÌå
             HttpEntity responseEntity = response.getEntity();
-            //System.out.println("å“åº”çŠ¶æ€ä¸º:" + response.getStatusLine());
+            //System.out.println("ÏìÓ¦×´Ì¬Îª:" + response.getStatusLine());
             if (responseEntity != null) {
-                //System.out.println("å“åº”å†…å®¹é•¿åº¦ä¸º:" + responseEntity.getContentLength());
+                //System.out.println("ÏìÓ¦ÄÚÈİ³¤¶ÈÎª:" + responseEntity.getContentLength());
                 String result = EntityUtils.toString(response.getEntity());
-                // ç”Ÿæˆ JSON å¯¹è±¡
+                // Éú³É JSON ¶ÔÏó
                 JSONObject obj = JSONObject.parseObject(result);
                 String data = obj.get("data").toString();
                 Map<String, String> cipher_map = JSON.parseObject(data, HashMap.class);
                 cipher_map.put("message", obj.get("message").toString());
                 cipher_map.put("status", obj.get("status").toString());
-                System.out.println("get_paramå“åº”å†…å®¹ä¸º:" + cipher_map);
+                System.out.println("get_paramÏìÓ¦ÄÚÈİÎª:" + cipher_map);
                 return cipher_map;
             }
             return null;
@@ -75,7 +75,7 @@ public class Connect {
             e.printStackTrace();
         } finally {
             try {
-                // é‡Šæ”¾èµ„æº
+                // ÊÍ·Å×ÊÔ´
                 if (httpClient != null) {
                     httpClient.close();
                 }
@@ -91,36 +91,36 @@ public class Connect {
 
     public void conn_fh(Map<String, String> cipher_map) {
         String url = firstHandshake_url;
-        // è·å¾—Httpå®¢æˆ·ç«¯
+        // »ñµÃHttp¿Í»§¶Ë
         CloseableHttpClient httpClient = HttpClients.createDefault();
-        // åˆ›å»ºPostè¯·æ±‚
+        // ´´½¨PostÇëÇó
         HttpPost httpPost = new HttpPost(url);
         Map<String, String> map = cht.send_map_first(vin);
         System.out.println("cht.send_map_first:" + map);
-        //å°†Objectè½¬æ¢ä¸ºjsonå­—ç¬¦ä¸²
+        //½«Object×ª»»Îªjson×Ö·û´®
         String jsonString = JSON.toJSONString(map);
 
         StringEntity entity = new StringEntity(jsonString, "UTF-8");
-        // postè¯·æ±‚æ˜¯å°†å‚æ•°æ”¾åœ¨è¯·æ±‚ä½“é‡Œé¢ä¼ è¿‡å»çš„;è¿™é‡Œå°†entityæ”¾å…¥postè¯·æ±‚ä½“ä¸­
+        // postÇëÇóÊÇ½«²ÎÊı·ÅÔÚÇëÇóÌåÀïÃæ´«¹ıÈ¥µÄ;ÕâÀï½«entity·ÅÈëpostÇëÇóÌåÖĞ
         httpPost.setEntity(entity);
 
         httpPost.setHeader("Content-Type", "application/json;charset=utf8");
-        //å“åº”æ¨¡å‹
+        //ÏìÓ¦Ä£ĞÍ
         CloseableHttpResponse response = null;
 
         try {
-            // ç”±å®¢æˆ·ç«¯æ‰§è¡Œ(å‘é€)Postè¯·æ±‚
+            // ÓÉ¿Í»§¶ËÖ´ĞĞ(·¢ËÍ)PostÇëÇó
             response = httpClient.execute(httpPost);
-            // ä»å“åº”æ¨¡å‹ä¸­è·å–å“åº”å®ä½“
+            // ´ÓÏìÓ¦Ä£ĞÍÖĞ»ñÈ¡ÏìÓ¦ÊµÌå
             HttpEntity responseEntity = response.getEntity();
 
-            //System.out.println("å“åº”çŠ¶æ€ä¸º:" + response.getStatusLine());
+            //System.out.println("ÏìÓ¦×´Ì¬Îª:" + response.getStatusLine());
             if (responseEntity != null) {
-                //System.out.println("å“åº”å†…å®¹é•¿åº¦ä¸º:" + responseEntity.getContentLength());
+                //System.out.println("ÏìÓ¦ÄÚÈİ³¤¶ÈÎª:" + responseEntity.getContentLength());
                 String result = EntityUtils.toString(response.getEntity());
 
                 Map<String, String> firstReceive_map = JSON.parseObject(result, HashMap.class);
-                System.out.println("conn_fhå“åº”å†…å®¹ä¸º:" + firstReceive_map);
+                System.out.println("conn_fhÏìÓ¦ÄÚÈİÎª:" + firstReceive_map);
                 Map<String, String> df_map = cht.dealFirst(firstReceive_map, firstReceive_map.get("clientRandom"), firstReceive_map.get("vinCode"),
                         cipher_map.get("signPrivateKeyStr"), cipher_map.get("exchangePrivateKeyStr"), cipher_map.get("masterEncryptKeyStr"),
                         cipher_map.get("masterSignKeyStr"));
@@ -136,7 +136,7 @@ public class Connect {
             e.printStackTrace();
         } finally {
             try {
-                // é‡Šæ”¾èµ„æº
+                // ÊÍ·Å×ÊÔ´
                 if (httpClient != null) {
                     httpClient.close();
                 }
@@ -152,34 +152,34 @@ public class Connect {
 
     public void conn_sh(Map<String, String> df_map, String vinCode) {
         String url = secondHandShake_url;
-        // è·å¾—Httpå®¢æˆ·ç«¯
+        // »ñµÃHttp¿Í»§¶Ë
         CloseableHttpClient httpClient = HttpClients.createDefault();
-        // åˆ›å»ºPostè¯·æ±‚
+        // ´´½¨PostÇëÇó
         HttpPost httpPost = new HttpPost(url);
-        //å°†Objectè½¬æ¢ä¸ºjsonå­—ç¬¦ä¸²
+        //½«Object×ª»»Îªjson×Ö·û´®
         String jsonString = JSON.toJSONString(df_map);
 
         StringEntity entity = new StringEntity(jsonString, "UTF-8");
-        // postè¯·æ±‚æ˜¯å°†å‚æ•°æ”¾åœ¨è¯·æ±‚ä½“é‡Œé¢ä¼ è¿‡å»çš„;è¿™é‡Œå°†entityæ”¾å…¥postè¯·æ±‚ä½“ä¸­
+        // postÇëÇóÊÇ½«²ÎÊı·ÅÔÚÇëÇóÌåÀïÃæ´«¹ıÈ¥µÄ;ÕâÀï½«entity·ÅÈëpostÇëÇóÌåÖĞ
         httpPost.setEntity(entity);
 
         httpPost.setHeader("Content-Type", "application/json;charset=utf8");
-        //å“åº”æ¨¡å‹
+        //ÏìÓ¦Ä£ĞÍ
         CloseableHttpResponse response = null;
 
         try {
-            // ç”±å®¢æˆ·ç«¯æ‰§è¡Œ(å‘é€)Postè¯·æ±‚
+            // ÓÉ¿Í»§¶ËÖ´ĞĞ(·¢ËÍ)PostÇëÇó
             response = httpClient.execute(httpPost);
-            // ä»å“åº”æ¨¡å‹ä¸­è·å–å“åº”å®ä½“
+            // ´ÓÏìÓ¦Ä£ĞÍÖĞ»ñÈ¡ÏìÓ¦ÊµÌå
             HttpEntity responseEntity = response.getEntity();
 
-            //System.out.println("å“åº”çŠ¶æ€ä¸º:" + response.getStatusLine());
+            //System.out.println("ÏìÓ¦×´Ì¬Îª:" + response.getStatusLine());
             if (responseEntity != null) {
-                //System.out.println("å“åº”å†…å®¹é•¿åº¦ä¸º:" + responseEntity.getContentLength());
+                //System.out.println("ÏìÓ¦ÄÚÈİ³¤¶ÈÎª:" + responseEntity.getContentLength());
                 String result = EntityUtils.toString(response.getEntity());
                 System.out.println("conn_sh_result:" + result);
                 Map<String, String> secondReceive_map = JSON.parseObject(result, HashMap.class);
-                System.out.println("conn_shå“åº”å†…å®¹ä¸º:" + secondReceive_map);
+                System.out.println("conn_shÏìÓ¦ÄÚÈİÎª:" + secondReceive_map);
                 boolean flag = cht.dealSecond(secondReceive_map, vinCode);
                 System.out.println("dealSecond result:" + flag);
             }
@@ -194,7 +194,7 @@ public class Connect {
             e.printStackTrace();
         } finally {
             try {
-                // é‡Šæ”¾èµ„æº
+                // ÊÍ·Å×ÊÔ´
                 if (httpClient != null) {
                     httpClient.close();
                 }
@@ -213,33 +213,33 @@ public class Connect {
         Map<String, String> message_map = new HashMap<>();
         message_map.put("message", message);
         String url = sendMessage_url;
-        // è·å¾—Httpå®¢æˆ·ç«¯
+        // »ñµÃHttp¿Í»§¶Ë
         CloseableHttpClient httpClient = HttpClients.createDefault();
-        // åˆ›å»ºPostè¯·æ±‚
+        // ´´½¨PostÇëÇó
         HttpPost httpPost = new HttpPost(url);
-        //å°†Objectè½¬æ¢ä¸ºjsonå­—ç¬¦ä¸²
+        //½«Object×ª»»Îªjson×Ö·û´®
         String jsonString = JSON.toJSONString(message_map);
 
         StringEntity entity = new StringEntity(jsonString, "UTF-8");
-        // postè¯·æ±‚æ˜¯å°†å‚æ•°æ”¾åœ¨è¯·æ±‚ä½“é‡Œé¢ä¼ è¿‡å»çš„;è¿™é‡Œå°†entityæ”¾å…¥postè¯·æ±‚ä½“ä¸­
+        // postÇëÇóÊÇ½«²ÎÊı·ÅÔÚÇëÇóÌåÀïÃæ´«¹ıÈ¥µÄ;ÕâÀï½«entity·ÅÈëpostÇëÇóÌåÖĞ
         httpPost.setEntity(entity);
 
         httpPost.setHeader("Content-Type", "application/json;charset=utf8");
-        //å“åº”æ¨¡å‹
+        //ÏìÓ¦Ä£ĞÍ
         CloseableHttpResponse response = null;
 
         try {
-            // ç”±å®¢æˆ·ç«¯æ‰§è¡Œ(å‘é€)Postè¯·æ±‚
+            // ÓÉ¿Í»§¶ËÖ´ĞĞ(·¢ËÍ)PostÇëÇó
             response = httpClient.execute(httpPost);
-            // ä»å“åº”æ¨¡å‹ä¸­è·å–å“åº”å®ä½“
+            // ´ÓÏìÓ¦Ä£ĞÍÖĞ»ñÈ¡ÏìÓ¦ÊµÌå
             HttpEntity responseEntity = response.getEntity();
 
-            //System.out.println("å“åº”çŠ¶æ€ä¸º:" + response.getStatusLine());
+            //System.out.println("ÏìÓ¦×´Ì¬Îª:" + response.getStatusLine());
             if (responseEntity != null) {
-                //System.out.println("å“åº”å†…å®¹é•¿åº¦ä¸º:" + responseEntity.getContentLength());
+                //System.out.println("ÏìÓ¦ÄÚÈİ³¤¶ÈÎª:" + responseEntity.getContentLength());
                 String result = EntityUtils.toString(response.getEntity());
                 //Map<String, String> secondReceive_map = JSON.parseObject(result, HashMap.class);
-                System.out.println("å“åº”å†…å®¹ä¸º:" + result);
+                System.out.println("ÏìÓ¦ÄÚÈİÎª:" + result);
             }
 
         } catch (ClientProtocolException e) {
@@ -250,7 +250,7 @@ public class Connect {
             e.printStackTrace();
         } finally {
             try {
-                // é‡Šæ”¾èµ„æº
+                // ÊÍ·Å×ÊÔ´
                 if (httpClient != null) {
                     httpClient.close();
                 }
