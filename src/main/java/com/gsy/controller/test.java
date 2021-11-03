@@ -1,35 +1,95 @@
 package com.gsy.controller;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.carsimu.Car_data;
+import com.socket.Tcp_sendmsg;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @Slf4j
 /*
-1¡¢Éú³ÉvinÂë
-2¡¢vinÂë´«ÈëCarÖĞ£¬»ñÈ¡ÃÜÔ¿
-3¡¢³É¹¦ºóÉú³ÉÊı¾İ
-4¡¢½«Êı¾İ´«¸ø·şÎñÆ÷
+1ã€ç”Ÿæˆvinç 
+2ã€vinç ä¼ å…¥Carä¸­ï¼Œè·å–å¯†é’¥
+3ã€æˆåŠŸåç”Ÿæˆæ•°æ®
+4ã€å°†æ•°æ®ä¼ ç»™æœåŠ¡å™¨
  */
+
 public class test {
     static int i = 0;
+    static int f = 0;
+    public static void main(String[] args) throws IOException, InterruptedException {
+        Gen_data gd = new Gen_data();
 
-    public static void main(String[] args) throws IOException {
-        for (; i < 1; i++) {
+        //æ­£å¸¸è½¦è¾†
+        /*for (; i < 10 ; i++) {
             new Thread(() -> {
-                int f = Integer.parseInt(Thread.currentThread().getName());
-                Car_data cd = new Car_data(f);
-                //log.info(cd.getVinCode());
-                String vinCode = cd.getVinCode();
-                Car car = new Car(vinCode);
-                //log.info(cd.sendMessage(f / 4 == 0 ? 2 : f / 4));
-                try {
-                    car.sendMessage(cd.sendMessage(f / 4 == 0 ? 2 : f / 4));
-                } catch (Exception e) {
-                    e.printStackTrace();
+                List<String> sendmsg = gd.gen_data(-1,-1);
+                Tcp_sendmsg tcp_sendmsg = new Tcp_sendmsg();
+                for(String tmp:sendmsg)
+                for(int j = 0;j<sendmsg.size();j++){
+                    try {
+                        tcp_sendmsg.sendMessage(sendmsg.get(j));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }, String.valueOf(i)).start();
+            Thread.sleep(200);
+        }*/
+
+        //è¶…é€Ÿ
+        for (; i < 1 ; i++) {
+            new Thread(() -> {
+                List<String> sendmsg = gd.gen_data_error(-1,-1,1,0,0);
+                Tcp_sendmsg tcp_sendmsg = new Tcp_sendmsg();
+                for(int j = 0;j<sendmsg.size();j++){
+                    try {
+                        tcp_sendmsg.sendMessage(sendmsg.get(j));
+                        System.out.println("send:" + sendmsg.get(j));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }, String.valueOf(i)).start();
+            Thread.sleep(200);
         }
+
+        //è¶…å‡ºåŒºåŸŸ
+        /*for (; i < 1 ; i++) {
+            new Thread(() -> {
+                List<String> sendmsg = gd.gen_data_error(-1,-1,0,1,0);
+                Tcp_sendmsg tcp_sendmsg = new Tcp_sendmsg();
+                for(String tmp:sendmsg)
+                    for(int j = 0;j<sendmsg.size();j++){
+                        try {
+                            tcp_sendmsg.sendMessage(sendmsg.get(j));
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+            }, String.valueOf(i)).start();
+            Thread.sleep(200);
+        }*/
+ /*       //ç¼ºå°‘æ¡æ‰‹
+        //ç¼ºå°‘ç¬¬ä¸€æ¬¡æ¡æ‰‹
+        for (; i < 1 ; i++) {
+            new Thread(() -> {
+                gd.gen_data_error(1,-1,0,0,0);
+            }, String.valueOf(i)).start();
+            Thread.sleep(200);
+        }
+        //ç¼ºå°‘ç¬¬äºŒæ¬¡æ¡æ‰‹
+        for (; i < 1 ; i++) {
+            new Thread(() -> {
+                gd.gen_data_error(2,-1,0,0,0);
+            }, String.valueOf(i)).start();
+            Thread.sleep(200);
+        }*/
     }
 }

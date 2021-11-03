@@ -26,44 +26,40 @@ public class Connect {
         String firstHandshake_url = "http://49.233.2.68:9008/platform/firstHandshake";
         String secondHandShake_url = "http://49.233.2.68:9008/platform/secondHandshake";
         String sendMessage_url = "http://49.233.2.68:9008/postMap";
-/*    String get_param_url = "http://192.168.12.134:9006/keys/getAll/";
-    String firstHandshake_url = "http://192.168.12.134:9008/platform/firstHandshake";
-    String secondHandShake_url = "http://192.168.12.134:9008/platform/secondHandshake";
-    String sendMessage_url = "http://192.168.12.134:9008/postMap";*/
 
-    public Connect(CarHandshakeTool cht, String vin) {
+    public Connect(CarHandshakeTool cht, String vin,int conn_error) {
         this.cht = cht;
         this.vin = vin;
     }
 
     /*
-³µÁ¾¼¤»î½×¶Î£¬»ñÈ¡³µÁ¾ĞèÒªµÄÏà¹ØÃÜÔ¿
+è½¦è¾†æ¿€æ´»é˜¶æ®µï¼Œè·å–è½¦è¾†éœ€è¦çš„ç›¸å…³å¯†é’¥
 */
     public Map<String, String> get_param(String vin) {
-        // »ñµÃHttp¿Í»§¶Ë(¿ÉÒÔÀí½âÎª:ÄãµÃÏÈÓĞÒ»¸öä¯ÀÀÆ÷;×¢Òâ:Êµ¼ÊÉÏHttpClientÓëä¯ÀÀÆ÷ÊÇ²»Ò»ÑùµÄ)
+        // è·å¾—Httpå®¢æˆ·ç«¯(å¯ä»¥ç†è§£ä¸º:ä½ å¾—å…ˆæœ‰ä¸€ä¸ªæµè§ˆå™¨;æ³¨æ„:å®é™…ä¸ŠHttpClientä¸æµè§ˆå™¨æ˜¯ä¸ä¸€æ ·çš„)
         CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-        // ´´½¨GetÇëÇó
+        // åˆ›å»ºGetè¯·æ±‚
         String url = get_param_url + vin;
         HttpGet httpGet = new HttpGet(url);
 
-        // ÏìÓ¦Ä£ĞÍ
+        // å“åº”æ¨¡å‹
         CloseableHttpResponse response = null;
         try {
-            // ÓÉ¿Í»§¶ËÖ´ĞĞ(·¢ËÍ)GetÇëÇó
+            // ç”±å®¢æˆ·ç«¯æ‰§è¡Œ(å‘é€)Getè¯·æ±‚
             response = httpClient.execute(httpGet);
-            // ´ÓÏìÓ¦Ä£ĞÍÖĞ»ñÈ¡ÏìÓ¦ÊµÌå
+            // ä»å“åº”æ¨¡å‹ä¸­è·å–å“åº”å®ä½“
             HttpEntity responseEntity = response.getEntity();
-            //System.out.println("ÏìÓ¦×´Ì¬Îª:" + response.getStatusLine());
+            //System.out.println("å“åº”çŠ¶æ€ä¸º:" + response.getStatusLine());
             if (responseEntity != null) {
-                //System.out.println("ÏìÓ¦ÄÚÈİ³¤¶ÈÎª:" + responseEntity.getContentLength());
+                //System.out.println("å“åº”å†…å®¹é•¿åº¦ä¸º:" + responseEntity.getContentLength());
                 String result = EntityUtils.toString(response.getEntity());
-                // Éú³É JSON ¶ÔÏó
+                // ç”Ÿæˆ JSON å¯¹è±¡
                 JSONObject obj = JSONObject.parseObject(result);
                 String data = obj.get("data").toString();
                 Map<String, String> cipher_map = JSON.parseObject(data, HashMap.class);
                 cipher_map.put("message", obj.get("message").toString());
                 cipher_map.put("status", obj.get("status").toString());
-                System.out.println("get_paramÏìÓ¦ÄÚÈİÎª:" + cipher_map);
+//                System.out.println("get_paramå“åº”å†…å®¹ä¸º:" + cipher_map);
                 return cipher_map;
             }
             return null;
@@ -75,7 +71,7 @@ public class Connect {
             e.printStackTrace();
         } finally {
             try {
-                // ÊÍ·Å×ÊÔ´
+                // é‡Šæ”¾èµ„æº
                 if (httpClient != null) {
                     httpClient.close();
                 }
@@ -89,43 +85,45 @@ public class Connect {
         return null;
     }
 
-    public void conn_fh(Map<String, String> cipher_map) {
+    public void conn_fh(Map<String, String> cipher_map,int conn_error) {
         String url = firstHandshake_url;
-        // »ñµÃHttp¿Í»§¶Ë
+        // è·å¾—Httpå®¢æˆ·ç«¯
         CloseableHttpClient httpClient = HttpClients.createDefault();
-        // ´´½¨PostÇëÇó
+        // åˆ›å»ºPostè¯·æ±‚
         HttpPost httpPost = new HttpPost(url);
         Map<String, String> map = cht.send_map_first(vin);
-        System.out.println("cht.send_map_first:" + map);
-        //½«Object×ª»»Îªjson×Ö·û´®
+//        System.out.println("cht.send_map_first:" + map);
+        //å°†Objectè½¬æ¢ä¸ºjsonå­—ç¬¦ä¸²
         String jsonString = JSON.toJSONString(map);
 
         StringEntity entity = new StringEntity(jsonString, "UTF-8");
-        // postÇëÇóÊÇ½«²ÎÊı·ÅÔÚÇëÇóÌåÀïÃæ´«¹ıÈ¥µÄ;ÕâÀï½«entity·ÅÈëpostÇëÇóÌåÖĞ
+        // postè¯·æ±‚æ˜¯å°†å‚æ•°æ”¾åœ¨è¯·æ±‚ä½“é‡Œé¢ä¼ è¿‡å»çš„;è¿™é‡Œå°†entityæ”¾å…¥postè¯·æ±‚ä½“ä¸­
         httpPost.setEntity(entity);
 
         httpPost.setHeader("Content-Type", "application/json;charset=utf8");
-        //ÏìÓ¦Ä£ĞÍ
+        //å“åº”æ¨¡å‹
         CloseableHttpResponse response = null;
 
         try {
-            // ÓÉ¿Í»§¶ËÖ´ĞĞ(·¢ËÍ)PostÇëÇó
+
+            // ç”±å®¢æˆ·ç«¯æ‰§è¡Œ(å‘é€)Postè¯·æ±‚
             response = httpClient.execute(httpPost);
-            // ´ÓÏìÓ¦Ä£ĞÍÖĞ»ñÈ¡ÏìÓ¦ÊµÌå
+            // ä»å“åº”æ¨¡å‹ä¸­è·å–å“åº”å®ä½“
             HttpEntity responseEntity = response.getEntity();
 
-            //System.out.println("ÏìÓ¦×´Ì¬Îª:" + response.getStatusLine());
+//            System.out.println("å“åº”çŠ¶æ€ä¸º:" + response.getStatusLine());
             if (responseEntity != null) {
-                //System.out.println("ÏìÓ¦ÄÚÈİ³¤¶ÈÎª:" + responseEntity.getContentLength());
+                //System.out.println("å“åº”å†…å®¹é•¿åº¦ä¸º:" + responseEntity.getContentLength());
                 String result = EntityUtils.toString(response.getEntity());
 
                 Map<String, String> firstReceive_map = JSON.parseObject(result, HashMap.class);
-                System.out.println("conn_fhÏìÓ¦ÄÚÈİÎª:" + firstReceive_map);
+//                System.out.println("conn_fhå“åº”å†…å®¹ä¸º:" + firstReceive_map);
                 Map<String, String> df_map = cht.dealFirst(firstReceive_map, firstReceive_map.get("clientRandom"), firstReceive_map.get("vinCode"),
                         cipher_map.get("signPrivateKeyStr"), cipher_map.get("exchangePrivateKeyStr"), cipher_map.get("masterEncryptKeyStr"),
                         cipher_map.get("masterSignKeyStr"));
-                System.out.println("cht.dealFirst:" + df_map);
-                conn_sh(df_map, firstReceive_map.get("vinCode"));
+//                System.out.println("cht.dealFirst:" + df_map);
+                if(conn_error!=2)
+                    conn_sh(df_map, firstReceive_map.get("vinCode"));
             }
 
         } catch (ClientProtocolException e) {
@@ -136,7 +134,7 @@ public class Connect {
             e.printStackTrace();
         } finally {
             try {
-                // ÊÍ·Å×ÊÔ´
+                // é‡Šæ”¾èµ„æº
                 if (httpClient != null) {
                     httpClient.close();
                 }
@@ -152,36 +150,36 @@ public class Connect {
 
     public void conn_sh(Map<String, String> df_map, String vinCode) {
         String url = secondHandShake_url;
-        // »ñµÃHttp¿Í»§¶Ë
+        // è·å¾—Httpå®¢æˆ·ç«¯
         CloseableHttpClient httpClient = HttpClients.createDefault();
-        // ´´½¨PostÇëÇó
+        // åˆ›å»ºPostè¯·æ±‚
         HttpPost httpPost = new HttpPost(url);
-        //½«Object×ª»»Îªjson×Ö·û´®
+        //å°†Objectè½¬æ¢ä¸ºjsonå­—ç¬¦ä¸²
         String jsonString = JSON.toJSONString(df_map);
 
         StringEntity entity = new StringEntity(jsonString, "UTF-8");
-        // postÇëÇóÊÇ½«²ÎÊı·ÅÔÚÇëÇóÌåÀïÃæ´«¹ıÈ¥µÄ;ÕâÀï½«entity·ÅÈëpostÇëÇóÌåÖĞ
+        // postè¯·æ±‚æ˜¯å°†å‚æ•°æ”¾åœ¨è¯·æ±‚ä½“é‡Œé¢ä¼ è¿‡å»çš„;è¿™é‡Œå°†entityæ”¾å…¥postè¯·æ±‚ä½“ä¸­
         httpPost.setEntity(entity);
 
         httpPost.setHeader("Content-Type", "application/json;charset=utf8");
-        //ÏìÓ¦Ä£ĞÍ
+        //å“åº”æ¨¡å‹
         CloseableHttpResponse response = null;
 
         try {
-            // ÓÉ¿Í»§¶ËÖ´ĞĞ(·¢ËÍ)PostÇëÇó
+            // ç”±å®¢æˆ·ç«¯æ‰§è¡Œ(å‘é€)Postè¯·æ±‚
             response = httpClient.execute(httpPost);
-            // ´ÓÏìÓ¦Ä£ĞÍÖĞ»ñÈ¡ÏìÓ¦ÊµÌå
+            // ä»å“åº”æ¨¡å‹ä¸­è·å–å“åº”å®ä½“
             HttpEntity responseEntity = response.getEntity();
 
-            //System.out.println("ÏìÓ¦×´Ì¬Îª:" + response.getStatusLine());
+            //System.out.println("å“åº”çŠ¶æ€ä¸º:" + response.getStatusLine());
             if (responseEntity != null) {
-                //System.out.println("ÏìÓ¦ÄÚÈİ³¤¶ÈÎª:" + responseEntity.getContentLength());
+//                System.out.println("å“åº”å†…å®¹é•¿åº¦ä¸º:" + responseEntity.getContentLength());
                 String result = EntityUtils.toString(response.getEntity());
-                System.out.println("conn_sh_result:" + result);
+//                System.out.println("conn_sh_result:" + result);
                 Map<String, String> secondReceive_map = JSON.parseObject(result, HashMap.class);
-                System.out.println("conn_shÏìÓ¦ÄÚÈİÎª:" + secondReceive_map);
+//                System.out.println("conn_shå“åº”å†…å®¹ä¸º:" + secondReceive_map);
                 boolean flag = cht.dealSecond(secondReceive_map, vinCode);
-                System.out.println("dealSecond result:" + flag);
+//                System.out.println("dealSecond result:" + flag);
             }
 
         } catch (ClientProtocolException e) {
@@ -194,7 +192,7 @@ public class Connect {
             e.printStackTrace();
         } finally {
             try {
-                // ÊÍ·Å×ÊÔ´
+                // é‡Šæ”¾èµ„æº
                 if (httpClient != null) {
                     httpClient.close();
                 }
@@ -213,33 +211,33 @@ public class Connect {
         Map<String, String> message_map = new HashMap<>();
         message_map.put("message", message);
         String url = sendMessage_url;
-        // »ñµÃHttp¿Í»§¶Ë
+        // è·å¾—Httpå®¢æˆ·ç«¯
         CloseableHttpClient httpClient = HttpClients.createDefault();
-        // ´´½¨PostÇëÇó
+        // åˆ›å»ºPostè¯·æ±‚
         HttpPost httpPost = new HttpPost(url);
-        //½«Object×ª»»Îªjson×Ö·û´®
+        //å°†Objectè½¬æ¢ä¸ºjsonå­—ç¬¦ä¸²
         String jsonString = JSON.toJSONString(message_map);
 
         StringEntity entity = new StringEntity(jsonString, "UTF-8");
-        // postÇëÇóÊÇ½«²ÎÊı·ÅÔÚÇëÇóÌåÀïÃæ´«¹ıÈ¥µÄ;ÕâÀï½«entity·ÅÈëpostÇëÇóÌåÖĞ
+        // postè¯·æ±‚æ˜¯å°†å‚æ•°æ”¾åœ¨è¯·æ±‚ä½“é‡Œé¢ä¼ è¿‡å»çš„;è¿™é‡Œå°†entityæ”¾å…¥postè¯·æ±‚ä½“ä¸­
         httpPost.setEntity(entity);
 
         httpPost.setHeader("Content-Type", "application/json;charset=utf8");
-        //ÏìÓ¦Ä£ĞÍ
+        //å“åº”æ¨¡å‹
         CloseableHttpResponse response = null;
 
         try {
-            // ÓÉ¿Í»§¶ËÖ´ĞĞ(·¢ËÍ)PostÇëÇó
+            // ç”±å®¢æˆ·ç«¯æ‰§è¡Œ(å‘é€)Postè¯·æ±‚
             response = httpClient.execute(httpPost);
-            // ´ÓÏìÓ¦Ä£ĞÍÖĞ»ñÈ¡ÏìÓ¦ÊµÌå
+            // ä»å“åº”æ¨¡å‹ä¸­è·å–å“åº”å®ä½“
             HttpEntity responseEntity = response.getEntity();
 
-            //System.out.println("ÏìÓ¦×´Ì¬Îª:" + response.getStatusLine());
+            //System.out.println("å“åº”çŠ¶æ€ä¸º:" + response.getStatusLine());
             if (responseEntity != null) {
-                //System.out.println("ÏìÓ¦ÄÚÈİ³¤¶ÈÎª:" + responseEntity.getContentLength());
+                //System.out.println("å“åº”å†…å®¹é•¿åº¦ä¸º:" + responseEntity.getContentLength());
                 String result = EntityUtils.toString(response.getEntity());
                 //Map<String, String> secondReceive_map = JSON.parseObject(result, HashMap.class);
-                System.out.println("ÏìÓ¦ÄÚÈİÎª:" + result);
+                System.out.println("å“åº”å†…å®¹ä¸º:" + result);
             }
 
         } catch (ClientProtocolException e) {
@@ -250,7 +248,7 @@ public class Connect {
             e.printStackTrace();
         } finally {
             try {
-                // ÊÍ·Å×ÊÔ´
+                // é‡Šæ”¾èµ„æº
                 if (httpClient != null) {
                     httpClient.close();
                 }

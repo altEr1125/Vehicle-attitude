@@ -7,7 +7,7 @@ public class EngineData implements InformationBody {
     private String carVin;    //对应车辆的vin码
     private String carSpeed;      //速度                  0000
     private String atmPre;    // 大气压                    C5
-    private String netTor; //净扭矩                        7D
+    private String netTor; //净扭矩                           7D
     private String friTor;  //实际扭矩                      83
     private String engineSpeed; //发动机转速                 0000
     private String engineFuelFlow;  // 发动机燃料流量          0000

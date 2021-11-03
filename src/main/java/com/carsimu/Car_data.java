@@ -27,8 +27,9 @@ public class Car_data {
         this.seed = seed;
         Random random = new Random(seed);
         StringBuilder vinCodeBuilder = new StringBuilder("");
-        for (int i = 0; i < 34; i++) {
-            vinCodeBuilder.append(intToHex(random.nextInt(16)));
+        for (int i = 0; i < 17; i++) {
+            int a = random.nextInt(90) % (90 - 65 + 1) + 65;
+            vinCodeBuilder.append(intToHex(a));
         }
         vinCode = vinCodeBuilder.toString();
         softVer = "01";
@@ -54,7 +55,7 @@ public class Car_data {
 
     }
 
-    public String sendMessage(int orderUnit) {
+/*    public String sendMessage(int orderUnit) {
         Message17691 message17691 = new Message17691();
         StringBuilder temp = new StringBuilder(intToHex(orderUnit));
         while (temp.length() < 2) temp.insert(0, '0');
@@ -97,15 +98,121 @@ public class Car_data {
         } else {
             message17691.setDataLength("0000");
         }
-        return ProtocolUtil.build17691(message17691);
+        return ProtocolUtil.build17691(message17691,0);
+    }*/
+
+    public String sendMessage(int orderUnit,String vinCode) {
+        Message17691 message17691 = new Message17691();
+        StringBuilder temp = new StringBuilder(intToHex(orderUnit));
+        while (temp.length() < 2) temp.insert(0, '0');
+        message17691.setOrderUnit(temp.toString());
+        basicInfo(message17691,vinCode);
+        if (orderUnit == 1) {         //登入
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+            String time1 = format.format(Calendar.getInstance().getTime());
+            String time2 = format.format(calendar.getTime());
+            if (time1.equals(time2)) logSN++;
+            else {
+                calendar = Calendar.getInstance();
+                logSN = 1;
+            }
+            message17691.setDataTime(calendar.getTime());
+            temp = new StringBuilder(intToHex(logSN));
+            while (temp.length() < 8) temp.insert(0, '0');
+            message17691.setLoginSN(temp.toString());
+            message17691.setSim(sim);
+            message17691.setDataLength("001C");
+        } else if (orderUnit == 2 || orderUnit == 3) {      //实时信息上报
+            message17691.setDataTime(calendar.getTime());
+            //暂时用现成数据
+            Message17691 m = ProtocolUtil.parse17691("2323024C47444348413147384D41313237373333010100AD15080E082F230100010100ABDEA9D64C47444348413147384D4131323737333359435933303136352D363020202020200000EC40A1BF000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000007145600AFE00200AFE06200AFE00900AF204700AF245500AFE01200AF0200010000C57D830000000000000000610000FEFFFEFFFEFF3D000006AFD31701EA55FE000000289F");
+            message17691.setInfoType(m.getInfoType());
+            message17691.setInfoSN(m.getInfoSN());
+            message17691.setInfoBodyList(m.getInfoBodyList());
+            ((EngineData) message17691.getInfoBodyList().get(1)).setCarSpeed(sensor.carSpeed());
+            ((EngineData) message17691.getInfoBodyList().get(1)).setLongitude(sensor.longitude());
+            ((EngineData) message17691.getInfoBodyList().get(1)).setLatitude(sensor.latitude());
+            message17691.setDataLength("00AD");
+        } else if (orderUnit == 4) {                //登出
+            message17691.setLogoutTime(getTime());
+            temp = new StringBuilder(intToHex(logSN));
+            while (temp.length() < 8) temp.insert(0, '0');
+            message17691.setLogoutSN(temp.toString());
+            message17691.setDataLength("000A");
+        } else {
+            message17691.setDataLength("0000");
+        }
+        return ProtocolUtil.build17691(message17691,0);
+    }
+
+    public String sendMessage_error(int orderUnit,String vinCode,int car_speed,int addr,int obd_error) {
+        Message17691 message17691 = new Message17691();
+        StringBuilder temp = new StringBuilder(intToHex(orderUnit));
+        while (temp.length() < 2) temp.insert(0, '0');
+        message17691.setOrderUnit(temp.toString());
+        basicInfo(message17691,vinCode);
+        if (orderUnit == 1) {         //登入
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+            String time1 = format.format(Calendar.getInstance().getTime());
+            String time2 = format.format(calendar.getTime());
+            if (time1.equals(time2)) logSN++;
+            else {
+                calendar = Calendar.getInstance();
+                logSN = 1;
+            }
+            message17691.setDataTime(calendar.getTime());
+            temp = new StringBuilder(intToHex(logSN));
+            while (temp.length() < 8) temp.insert(0, '0');
+            message17691.setLoginSN(temp.toString());
+            message17691.setSim(sim);
+            message17691.setDataLength("001C");
+        } else if (orderUnit == 2 || orderUnit == 3) {      //实时信息上报
+            message17691.setDataTime(calendar.getTime());
+            //暂时用现成数据
+            Message17691 m = ProtocolUtil.parse17691("2323024C47444348413147384D41313237373333010100AD15080E082F230100010100ABDEA9D64C47444348413147384D4131323737333359435933303136352D363020202020200000EC40A1BF000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000007145600AFE00200AFE06200AFE00900AF204700AF245500AFE01200AF0200010000C57D830000000000000000610000FEFFFEFFFEFF3D000006AFD31701EA55FE000000289F");
+            message17691.setInfoType(m.getInfoType());
+            message17691.setInfoSN(m.getInfoSN());
+            message17691.setInfoBodyList(m.getInfoBodyList());
+            if(car_speed==1)
+                ((EngineData) message17691.getInfoBodyList().get(1)).setCarSpeed(sensor.carSpeed_error());
+            else
+                ((EngineData) message17691.getInfoBodyList().get(1)).setCarSpeed(sensor.carSpeed());
+            if(addr==1) {
+                ((EngineData) message17691.getInfoBodyList().get(1)).setLongitude(sensor.longitude());
+                ((EngineData) message17691.getInfoBodyList().get(1)).setLatitude(sensor.latitude());
+            }
+            else {
+                ((EngineData) message17691.getInfoBodyList().get(1)).setLongitude(sensor.longitude());
+                ((EngineData) message17691.getInfoBodyList().get(1)).setLatitude(sensor.latitude());
+            }
+//            if(obd==1)
+//
+//            else
+//
+            message17691.setDataLength("00AD");
+        } else if (orderUnit == 4) {                //登出
+            message17691.setLogoutTime(getTime());
+            temp = new StringBuilder(intToHex(logSN));
+            while (temp.length() < 8) temp.insert(0, '0');
+            message17691.setLogoutSN(temp.toString());
+            message17691.setDataLength("000A");
+        } else {
+            message17691.setDataLength("0000");
+        }
+        return ProtocolUtil.build17691(message17691,obd_error);
     }
 
     public void stop() {
 
     }
-
     void basicInfo(Message17691 message17691) {
         message17691.setVinCode(vinCode);
+        message17691.setSoftVer(softVer);
+        message17691.setEncryption(encryption);
+    }
+
+    void basicInfo(Message17691 message17691,String vinCode1) {
+        message17691.setVinCode(vinCode1);
         message17691.setSoftVer(softVer);
         message17691.setEncryption(encryption);
     }

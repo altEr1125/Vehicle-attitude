@@ -18,7 +18,7 @@ public class Sensor {
         this.seed = seed;
         random = new Random(seed);
         int i = random.nextInt(100);
-        if (i > 90) speedControl = 1;
+        if (i > 80) speedControl = 1;
         else speedControl = 0;
         i = random.nextInt(100);
         if (i < 90) longitudeControl = 0;
@@ -184,8 +184,14 @@ public class Sensor {
 
     public String carSpeed() {
         int speed;
-        if (speedControl == 0) speed = 90 + random.nextInt(30);
-        else speed = 120 + random.nextInt(30);
+        speed = 50 + random.nextInt(30);
+        StringBuilder carSpeed = new StringBuilder(intToHex(speed));
+        while (carSpeed.length() < 4) carSpeed.insert(0, '0');
+        return carSpeed.toString();
+    }
+    public String carSpeed_error() {
+        int speed;
+        speed = 80 + random.nextInt(30);
         StringBuilder carSpeed = new StringBuilder(intToHex(speed));
         while (carSpeed.length() < 4) carSpeed.insert(0, '0');
         return carSpeed.toString();
@@ -268,19 +274,30 @@ public class Sensor {
 
     public String longitude() {
         int l;
-        if (longitudeControl == 0) l = 116281237 + random.nextInt(116497980 - 116281237);
-        else if (longitudeControl == 1) l = 116281237 - random.nextInt(2000);
-        else l = 116497980 + random.nextInt(2000);
+        l = 116264205 + random.nextInt(116551735 - 116264205);
         StringBuilder longitude = new StringBuilder(intToHex(l));
         while (longitude.length() < 8) longitude.insert(0, '0');
         return longitude.toString();
     }
 
     public String latitude() {
+        int l;l = 39817576 + random.nextInt(40035360 - 39817576);
+        StringBuilder latitude = new StringBuilder(intToHex(l));
+        while (latitude.length() < 8) latitude.insert(0, '0');
+        return latitude.toString();
+    }
+
+    public String longitude_error() {
         int l;
-        if (latitudeControl == 0) l = 39842732 + random.nextInt(39991041 - 39842732);
-        else if (latitudeControl == 1) l = 39842732 - random.nextInt(2000);
-        else l = 39991041 + random.nextInt(2000);
+        l = 116264205 - random.nextInt(2000);
+        StringBuilder longitude = new StringBuilder(intToHex(l));
+        while (longitude.length() < 8) longitude.insert(0, '0');
+        return longitude.toString();
+    }
+
+    public String latitude_error() {
+        int l;
+        l = 39817576 - random.nextInt(2000);
         StringBuilder latitude = new StringBuilder(intToHex(l));
         while (latitude.length() < 8) latitude.insert(0, '0');
         return latitude.toString();

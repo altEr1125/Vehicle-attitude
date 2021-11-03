@@ -409,7 +409,7 @@ public class ProtocolUtil {
         return intToHex(i);
     }
 
-    public static String build17691(Message17691 message17691) {        // 创建17691数据
+    public static String build17691(Message17691 message17691,int obd_error) {        // 创建17691数据
         StringBuilder msg = new StringBuilder("2323");
 
         if (message17691.getOrderUnit() == null) return "error orderUnit !";
@@ -433,7 +433,7 @@ public class ProtocolUtil {
             for (int i = 0; i < message17691.getInfoType().size(); i++) {
                 if (message17691.getInfoType().get(i).startsWith("01")) {
                     msg.append("01").append(message17691.getInfoSN().get(i));
-                    String temp = buildOBDInfo((OBDData) message17691.getInfoBodyList().get(i));
+                    String temp = buildOBDInfo((OBDData) message17691.getInfoBodyList().get(i),obd_error);
                     if (temp.startsWith("error")) return "error obdData !";
                     else msg.append(temp);
                 } else if (message17691.getInfoType().get(i).startsWith("02")) {
@@ -468,7 +468,7 @@ public class ProtocolUtil {
         else return m.getError().get(0);
     }
 
-    private static String buildOBDInfo(OBDData obdData) {
+    private static String buildOBDInfo(OBDData obdData,int obd_error) {
         StringBuilder obd = new StringBuilder();
 
         if (obdData.getObdProtocol() == null) return "error obdProtocol !";

@@ -2,7 +2,7 @@
 <project version="4">
   <component name="Encoding" defaultCharsetForPropertiesFiles="UTF-8">
     <file url="file://$PROJECT_DIR$/src/main/java/com/gsy/controller/Connect.java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/src/main/java/com/gsy/controller/test.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/main/java/com/gsy/controller/test.java" charset="UTF-8" />
     <file url="PROJECT" charset="UTF-8" />
   </component>
 </project>

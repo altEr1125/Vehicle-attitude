@@ -1,8 +1,9 @@
 package com.gsy.controller;
 
 import com.gsy.encrypt.gm.sm3.SM3;
-import com.gsy.encrypt.gm.sm4.SM4;
 import com.gsy.encrypt.gm.sm9.*;
+import com.gsy.util.CodeUtil;
+import com.gsy.util.EncryptUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import java.nio.charset.StandardCharsets;
@@ -177,7 +178,7 @@ public class CarHandshakeTool {
      */
     public boolean dealSecond(Map<String, String> map, String myServiceName) throws NoSuchAlgorithmException {
         //System.out.println("ddddddddd deal dealSecond");
-        System.out.println(map);
+//        System.out.println(map);
 
         byte[] saBytes1 = CodeUtil.decodeStringToByte(this.sk);
         byte[] saBytes = SM3.getInstance().digest(saBytes1);
@@ -204,10 +205,12 @@ public class CarHandshakeTool {
         return false;
     }
 
-    public String encrypt_sendMessage(String message) throws Exception {
-        byte[] message_bytes = CodeUtil.decodeStringToByte(message);
-        String result = CodeUtil.encodeToString(
-                SM4.ecbCrypt(true, CodeUtil.decodeStringToByte(this.sk), message_bytes, 0, message.length()));
+    public byte[] encrypt_sendMessage(String message) throws Exception {
+        //测试
+        byte[] result = EncryptUtil.encryptByte2Byte(message.getBytes(StandardCharsets.UTF_8),new byte[16]);
+//        byte[] message_bytes = CodeUtil.decodeStringToByte(message);
+//        String result = CodeUtil.encodeToString(
+//                SM4.ecbCrypt(true, CodeUtil.decodeStringToByte(this.sk), message_bytes, 0, message.length()));
         return result;
     }
 }
